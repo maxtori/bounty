@@ -1,0 +1,14 @@
+{
+  "name": "bounty",
+  "short_name": "bounty",
+  "description": "bounty",
+  "start_url": "index.html",
+  "display": "standalone",
+  "theme_color": "#212529",
+  "background_color": "#212529",
+  "serviceworker": "sw.js",
+  "icons": [
+    { "src": "assets/bounty_192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/bounty_512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/bounty_512.png", "sizes": "any", "type": "image/png" } ]
+}

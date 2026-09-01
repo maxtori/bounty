@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Bounty</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="Bounty">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://maxtori.github.io/bounty/assets/bounty_192.png">
+    <meta property="og:url" content="https://maxtori.github.io/bounty">
+    <link rel="icon" href="assets/bounty_192.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="assets/bs.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/vue/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+    <script src="app.bc.js" defer></script>
+  </head>
+  <body data-bs-theme="dark">
+    <div id="app-loading" style="height:100vh"></div>
+    <div id="app" style="display:none;">
+      <navigation :page="selected" @nav="nav" @push="push"></navigation>
+      <div class="container-fluid mt-3 mb-5 px-0">
+        <div v-if="page.loading!==undefined" class="text-center my-5 py-5"><div class="spinner-border"></div></div>
+        <adventures v-else-if="page.adventures!==undefined" ref="adventures" :adventures="page.adventures" @nav="nav"></adventures>
+        <adventure v-else-if="page.adventure!==undefined" ref="adventure" :adventure="page.adventure" @nav="nav"></adventure>
+        <new-adventure v-else-if="page.new_adventure!==undefined" ref="new_adventure" @nav="nav" @alert="alert"></new-adventure>
+        <new-adventure v-else-if="page.edit_adventure!==undefined" ref="edit_adventure" :adventure="page.edit_adventure" @nav="nav" @alert="alert"></new-adventure>
+        <join-adventure v-else-if="page.join_adventure!==undefined" ref="join_adventure" :info="page.join_adventure" @nav="nav" @alert="alert"></join-adventure>
+        <loot v-else-if="page.loot!==undefined" :loot="page.loot" @nav="nav" @alert="alert"></loot>
+        <new-loot v-else-if="page.new_loot!==undefined" ref="new_loot" :adv="page.new_loot" @nav="nav" @alert="alert"></new-loot>
+        <new-loot v-else-if="page.edit_loot!==undefined" ref="edit_loot" :adv="page.edit_loot.adv" :loot="page.edit_loot.loot" @nav="nav" @alert="alert"></new-loot>
+        <settings v-else-if="page.settings!==undefined" ref="settings" :settings="page.settings" @nav="nav"></settings>
+
+        <div id="error-modal" class="modal">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-body text-center">
+                {{ error }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

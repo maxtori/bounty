@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128"
+     role="img" aria-label="A pirate ship with a treasure chest in the foreground">
+  <title>Bounty</title>
+
+  <!-- ===================== SHIP (background, ~90% of canvas) ===================== -->
+  <!-- No rigging lines in this version: they crossed the sails and read as clutter -->
+
+  <!-- masts, yards, bowsprit -->
+  <g stroke="#000" fill="none" stroke-linecap="round">
+    <path d="M64 10 V88" stroke-width="3.4"/>
+    <path d="M30 14 V86" stroke-width="3"/>
+    <path d="M96 18 V86" stroke-width="3"/>
+    <path d="M40 28 H88" stroke-width="3"/>
+    <path d="M16 44 H44" stroke-width="2.6"/>
+    <path d="M82 46 H112" stroke-width="2.6"/>
+    <path d="M16 84 L1 69" stroke-width="4"/>
+  </g>
+
+  <!-- pennants, shorter than v1 -->
+  <g fill="#000">
+    <path d="M65 10 L86 16 L65 22 Z"/>
+    <path d="M31 14 L44 18 L31 22 Z"/>
+    <path d="M97 18 L110 22 L97 26 Z"/>
+  </g>
+
+  <!-- side sails: straight yard on top, sagging foot, so they read as canvas not shields -->
+  <g fill="#fff" stroke="#000" stroke-width="2.2" stroke-linejoin="round">
+    <path d="M16 44 H44 L46 64 C37 78 25 78 14 64 Z"/>
+    <path d="M82 46 H112 L114 64 C105 76 93 76 80 64 Z"/>
+  </g>
+
+  <!-- mainsail: yard at y=28, foot dropped to ~84 (just clear of the deck at 86),
+       giving 56 units of height for the emblem instead of 46 -->
+  <path d="M40 28 H88 L92 66 C80 90 50 90 36 66 Z"
+        fill="#fff" stroke="#000" stroke-width="2.4" stroke-linejoin="round"/>
+
+  <!-- skull and crossbones, scaled up to fill the taller mainsail -->
+  <g fill="#000">
+    <!-- crossbones, asymmetric: upper arms 18 long, lower stay 12.5 -->
+    <g transform="translate(65 71)">
+      <!-- under rotate(32) the local -x end is the upper-left arm, so extend that side -->
+      <g transform="rotate(32)">
+        <rect x="-18" y="-3" width="30.5" height="6" rx="3"/>
+        <circle cx="-18" cy="-3.4" r="3.4"/><circle cx="-18" cy="3.4" r="3.4"/>
+        <circle cx="12.5" cy="-3.4" r="3.4"/><circle cx="12.5" cy="3.4" r="3.4"/>
+      </g>
+      <!-- mirrored: under rotate(-32) the local +x end is the upper-right arm -->
+      <g transform="rotate(-32)">
+        <rect x="-12.5" y="-3" width="30.5" height="6" rx="3"/>
+        <circle cx="18" cy="-3.4" r="3.4"/><circle cx="18" cy="3.4" r="3.4"/>
+        <circle cx="-12.5" cy="-3.4" r="3.4"/><circle cx="-12.5" cy="3.4" r="3.4"/>
+      </g>
+    </g>
+    <!-- cranium and jaw, drawn over the bones -->
+    <circle cx="65" cy="47" r="13"/>
+    <rect x="58.5" y="56" width="13" height="8.5" rx="2.4"/>
+  </g>
+  <g fill="#fff">
+    <circle cx="59.9" cy="45" r="4.1"/>
+    <circle cx="70.1" cy="45" r="4.1"/>
+    <path d="M65 49.8 L62.4 54.6 H67.6 Z"/>
+    <rect x="60.2" y="57.4" width="2.2" height="3.8" rx="0.4"/>
+    <rect x="63.1" y="57.4" width="2.2" height="3.8" rx="0.4"/>
+    <rect x="66" y="57.4" width="2.2" height="3.8" rx="0.4"/>
+    <rect x="68.9" y="57.4" width="2.2" height="3.8" rx="0.4"/>
+  </g>
+
+  <!-- sterncastle -->
+  <path d="M98 88 V74 Q98 71.5 100.5 71.5 H120 Q123 71.5 122 75 L119 88 Z" fill="#000"/>
+  <rect x="106" y="76" width="7" height="6" rx="1" fill="#fff"/>
+
+  <!-- hull -->
+  <path d="M10 86 H120 C116 104 100 114 65 114 C30 114 14 104 10 86 Z" fill="#000"/>
+  <rect x="15" y="89.5" width="100" height="2.8" fill="#fff"/>
+  <g fill="#fff">
+    <rect x="24" y="97" width="6" height="6" rx="1"/>
+    <rect x="38" y="98.5" width="6" height="6" rx="1"/>
+    <rect x="52" y="99.5" width="6" height="6" rx="1"/>
+    <rect x="66" y="99.5" width="6" height="6" rx="1"/>
+  </g>
+
+  <!-- ============ TREASURE CHEST (closed, foreground, ~40% of canvas) ============ -->
+  <!-- v1's dome was widest at its base, so the lid vanished. Here the sides run
+       straight up to y=88 and only the shoulders round off, giving a real lid. -->
+  <defs>
+    <clipPath id="chest2">
+      <path d="M74 88 Q74 78 100 78 Q126 78 126 88 V117 Q126 120 123 120 H77 Q74 120 74 117 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- white fill occludes the hull and mizzen sail behind -->
+  <path d="M74 88 Q74 78 100 78 Q126 78 126 88 V117 Q126 120 123 120 H77 Q74 120 74 117 Z"
+        fill="#fff"/>
+
+  <!-- lid seam and straps, clipped to the silhouette -->
+  <g clip-path="url(#chest2)" fill="#000">
+    <rect x="74" y="93" width="52" height="5"/>
+    <rect x="82" y="78" width="6" height="42"/>
+    <rect x="112" y="78" width="6" height="42"/>
+  </g>
+
+  <!-- outline last so the straps don't eat into it -->
+  <path d="M74 88 Q74 78 100 78 Q126 78 126 88 V117 Q126 120 123 120 H77 Q74 120 74 117 Z"
+        fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/>
+
+  <!-- lock plate -->
+  <rect x="93" y="100" width="14" height="13" rx="2" fill="#000"/>
+  <circle cx="100" cy="104.5" r="2.6" fill="#fff"/>
+  <path d="M98.8 106 H101.2 L102.2 110.5 H97.8 Z" fill="#fff"/>
+</svg>

@@ -1,0 +1,83 @@
+<div>
+  <div class="card text-center">
+    <div class="card-header">Adventure</div>
+    <div class="card-body" role="button" @click="adventure(adv)">{{ adv.name }}</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header text-center">{{ update ? 'Edit' : 'New' }} Loot</div>
+    <div class="card-body">
+      <div class="my-3">
+        <label class="form-label">Name</label>
+        <input class="form-control" v-model="lt.name">
+      </div>
+      <div class="my-3">
+        <label class="form-label">Treasurer</label>
+        <select class="form-select" v-model="lt.treasurer">
+          <option v-for="c in adv.crew" :value="c.id" :selected="lt.treasurer==c.id">{{ c.name }}</option>
+        </select>
+      </div>
+      <div class="my-3">
+        <label class="form-label">Date</label>
+        <input class="form-control" type="datetime-local" :value="tsp_to_datetime(lt.date)" @change="change_date"/>
+      </div>
+      <div class="my-3">
+        <label class="form-label">Sharing</label>
+        <select class="form-select" v-model="sharing" @change="change_sharing(sharing)">
+          <option value="equal">equal</option>
+          <option value="weighted">weighted</option>
+          <option value="custom">custom</option>
+        </select>
+      </div>
+      <div class="my-3">
+        <label class="form-label">Amount</label>
+        <div class="input-group">
+          <input class="form-control" v-model="lt.amount.str" @change="change_amount(lt.amount.str)" :disabled="sharing==='custom'"/>
+          <template v-if="lt.currency!==null">
+            <input class="form-control" v-model="lt.currency.symbol" @change="change_currency"/>
+            <input class="form-control" type="number" v-model="lt.currency.factor" step="0.01"/>
+          </template>
+          <input v-else class="form-control" :value="adv.currency" @change="change_currency"/>
+        </div>
+      </div>
+      <div class="my-3">
+        <div v-if="sharing==='equal'" v-for="s in lt.shares.equal" class="card">
+          <div class="card-body row gx-0">
+            <div class="col-4 text-center">{{ sailor_name(s) }}</div>
+            <div class="col-8">
+              <div class="input-group mx-auto" style="width:120px">
+                <input class="form-control py-0" disabled :value="show_equal_amount(s).str"/>
+                <span class="input-group-text py-0">{{ currency }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-if="sharing==='weighted'" v-for="s in lt.shares.weighted" class="card">
+          <div class="card-body row gx-0">
+            <div class="col-4 text-center">{{ sailor_name(s.sailor) }}</div>
+            <div class="col-8">
+              <div class="d-flex mx-auto">
+                <input class="form-control py-0" type="number" v-model="s.weight" style="width:70px" min="0"/>
+                <div class="input-group" style="width:120px">
+                  <input class="form-control py-0" disabled :value="show_weighted_amount(s.sailor, lt.shares.weighted).str"/>
+                  <span class="input-group-text py-0">{{ currency }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-if="sharing==='custom'" v-for="s in lt.shares.custom" class="card">
+          <div class="card-body row gx-0">
+            <div class="col-4 text-center">{{ sailor_name(s.sailor) }}</div>
+            <div class="col-8">
+              <div class="input-group mx-auto" style="width:120px">
+                <input class="form-control py-0" v-model="s.amount.str" @change="change_custom_amount(s.sailor, s.amount.str, lt.shares.custom)"/>
+                <span class="input-group-text py-0">{{ currency }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

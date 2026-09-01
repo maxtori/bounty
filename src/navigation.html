@@ -1,0 +1,20 @@
+<div>
+  <nav class="navbar navbar-expand text-center pb-0" style="position:fixed;bottom:0px;right:0;left:0;z-index:1000;background-color:var(--bs-body-bg);">
+    <ul class="navbar-nav flex-fill">
+      <li class="nav-item border" style="width: 10%">
+        <a class="nav-link" role="button" @click="settings()">
+          <i class="bi bi-gear-fill"></i>
+        </a>
+      </li>
+      <li class="nav-item border" style="width: 45%">
+        <a class="nav-link" role="button" @click="adventures()">Adventures</a>
+      </li>
+      <li class="nav-item border" style="width: 45%">
+        <a class="nav-link" role="button" @click="push()" :class="push_content.cl">
+          {{ push_content.txt }}
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <slot ref="content"></slot>
+</div>

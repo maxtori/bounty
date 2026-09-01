@@ -1,0 +1,15 @@
+(rule
+ (deps package.json bs.scss)
+ (targets bs.css)
+ (action
+  (progn
+   (run npm --silent i)
+   (run npx sass --no-source-map --style compressed -q bs.scss %{targets}))))
+
+(install
+ (package bounty)
+ (section share)
+ (files
+  (glob_files (*.css with_prefix assets/))
+  (glob_files (*.png with_prefix assets/))
+))
