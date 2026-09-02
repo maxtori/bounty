@@ -18,7 +18,7 @@ let%computed push_content app : push_content = match Ezjs_min.to_string app##.pa
   | _ -> { txt=""; cl="" }
 
 let%meth settings app = nav app @@ mkr (Settings { id = !Db.peer; theme = !Db.theme; currency = !Db.currency })
-and adventures app = nav app @@ mkr (Adventures [])
+and adventures app = nav app @@ mkr Adventures
 and push app = [%emit "push" app]
 
 [%%comp {name="navigation"; conv}]

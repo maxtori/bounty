@@ -19,8 +19,8 @@ type settings = {
 
 type page =
   | Loading
-  | Adventures of adventure list
-  | Adventure of adventure
+  | Adventures
+  | Adventure of A.id
   | NewAdventure
   | EditAdventure of adventure
   | Loot of adv_and_loot

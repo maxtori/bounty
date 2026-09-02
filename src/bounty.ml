@@ -46,7 +46,6 @@ type loot = {
   name: string;
   updated: A.tsp;
   date: A.tsp;
-  update: A.tsp;
   captain: A.id;
   treasurer: A.id;
   amount: amount;
@@ -65,8 +64,11 @@ type adventure = {
 } [@@deriving encoding, jsoo {mut}]
 
 type modif_kind =
-  | Adventure of adventure
-  | NewLoot of loot
+  | AdventureName of string
+  | AdventureCurrency of string
+  | Sailor of sailor
+  | RemoveSailor of A.id
+  | Loot of loot
   | RemoveLoot of A.id
 [@@deriving encoding, jsoo]
 
@@ -195,5 +197,5 @@ let compare_loot lt1 lt2 =
   String.compare s1 s2
 
 let compare_modif m1 m2 =
-  let c = if m1.origin = m2.origin then Int.compare m1.seq m2.seq else Float.compare m1.tsp m2.tsp in
+  let c = Float.compare m1.tsp m2.tsp in
   if c <> 0 then c else String.compare m1.id m2.id

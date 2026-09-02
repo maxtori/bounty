@@ -90,6 +90,10 @@ let get_adventures f =
   AdventureStore.get_all ast @@ fun l ->
   f (List.sort compare_adventure l)
 
+let adventures_count f =
+  let ast = AdventureStore.store ~mode:READONLY !db in
+  AdventureStore.count ast f
+
 let get_adventure id f =
   let st = AdventureStore.store ~mode:READONLY !db in
   store_get (module AdventureStore) st id f
@@ -174,14 +178,30 @@ let create_modif ?(id=id ()) ~tsp ~adventure kind =
   let seq = match List.assoc_opt origin sync with Some seq -> seq+1 | None -> 1 in
   let m = { id; adventure; kind; origin; seq; tsp } in
   register_modif m;
-  m, sync
+  m
 
 let apply_modif adv (m: modif) f = match m.kind with
-  | Adventure a -> update_adventure ~cb:(fun _ -> f a) a
+  | AdventureName name ->
+    let a = { adv with name; updated=m.tsp } in
+    update_adventure ~cb:(fun _ -> f a) a
+  | AdventureCurrency currency ->
+    let a = { adv with currency; updated=m.tsp } in
+    update_adventure ~cb:(fun _ -> f a) a
+  | Sailor s ->
+    let crew, sailor = List.fold_left (fun (crew, s) (sailor: sailor) -> match s with
+      | Some (s: sailor) when s.id = sailor.id -> crew @ [ s ], None
+      | _ -> crew @ [ sailor ], s) ([], Some s) adv.crew in
+    let crew = match sailor with None -> crew | Some s -> crew @ [ s ] in
+    let a = { adv with crew; updated=m.tsp } in
+    update_adventure ~cb:(fun _ -> f a) a
+  | RemoveSailor id ->
+    let crew = List.filter (fun (s: sailor) -> s.id <> id) adv.crew in
+    let a = { adv with crew; updated=m.tsp } in
+    update_adventure ~cb:(fun _ -> f a) a
   | RemoveLoot id ->
     let adv = { adv with updated=m.tsp } in
     remove_loot ~cb:(fun _ -> update_adventure ~cb:(fun _ -> f adv) adv) id
-  | NewLoot lt ->
+  | Loot lt ->
     let adv = { adv with updated=lt.updated } in
     register_loot ~cb:(fun _ -> update_adventure ~cb:(fun _ -> f adv) adv) lt
 
@@ -204,11 +224,13 @@ let print_sync fmt sync =
   List.map (fun (peer, seq) -> Format.sprintf "%s: %d" peer seq) sync
 
 let insert_modifs ~adventure (sync, l) f =
-  List.iter register_modif l;
   let base = modifs_after_sync ~adventure sync in
-  let l = match base with [] -> l | _ -> List.sort compare_modif (base @ l) in
-  get_adventure adventure @@ fun x ->
-  Option.iter (fun adv -> apply_modifs adv l (fun _ -> f ())) x
+  let after = match base with [] -> l | _ -> List.sort compare_modif (base @ l) in
+  get_adventure adventure @@ function
+  | None -> ()
+  | Some adv ->
+    List.iter register_modif l;
+    apply_modifs adv after (fun _ -> f ())
 
 let outdated_sync ~adventure sync =
   let s = get_sync adventure in

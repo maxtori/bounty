@@ -25,25 +25,30 @@ let navigate app (r: route_jsoo t) =
       Dom_html.window##.history##pushState (state p1) (string "") path in
   finish app
 
-let adventures app l = navigate app (mkr (Adventures l))
-let new_adventure app = navigate app (mkr ~loading:false NewAdventure)
+let init app = navigate app (mkr Adventures)
 
-let init app =
-  Db.get_adventures @@ function
-  | [] -> new_adventure app
-  | l -> adventures app l
+let refresh app adventure = match page_of_jsoo app##.page with
+  | Adventure id when id = adventure -> navigate app (mkr (Adventure id))
+  | EditAdventure ({ id; _ } as adv) when id = adventure -> app##nav (mkr (EditAdventure { adv with loots=[] }))
+  | Adventures -> navigate app (mkr Adventures)
+  | _ -> ()
 
 let load app =
+  Db.open_ @@ fun () ->
   Db.load_settings @@ fun () ->
   Db.get_adventures @@ fun adventures ->
   Db.init adventures @@ fun () ->
   Comm.init adventures;
+  Comm.refresh := refresh app;
   Dom_html.window##.onpopstate := Dom_html.handler (fun (e : Dom_html.popStateEvent t) ->
     (try navigate app (mkrjs ~set_state:false @@ Unsafe.coerce e##.state) with _exn -> init app); _false);
   (Unsafe.coerce Dom_html.window)##.onfocus := Dom_html.handler (fun (_e : Dom_html.popStateEvent t) ->
     let now = Int32.to_int (to_int32 date##now) / 1000 in
     if now > app##.tsp + 3600 then navigate app (mkrjs app##.page);
     _false);
+  let error_elt = Dom_html.getElementById "error-modal" in
+  ignore (Js_of_ocaml.Dom_events.listen error_elt (Js_of_ocaml.Dom_events.Typ.make "hide.bs.modal") @@ fun _ _ ->
+          app##.error := undefined; true);
   let join_param =
     let search = to_string Dom_html.window##.location##.search in
     if search = "" then None else
@@ -73,10 +78,6 @@ let selected page =
 let%computed selected app : string = selected app##.page
 
 let%meth [@noconv] nav app (r: route_jsoo t) = match route_of_jsoo r with
-  | { page = Adventures []; _ } -> init app
-  | { page = Adventure ({loots=[]; _ } as adv); _ } as r ->
-    Db.load_loots ~adventure:adv.id @@ fun loots ->
-    navigate app (route_to_jsoo { r with page = Adventure { adv with loots } })
   | { page = EditAdventure adv; _ } as r ->
     Db.get_adventure adv.id (function
       | None -> init app
@@ -95,13 +96,7 @@ and [@noconv] push app =
   | Some comp -> (Unsafe.coerce comp)##push
   | _ -> ()
 
-[%%mounted fun app ->
-  Db.open_ @@ fun () ->
-  load app;
-  let error_elt = Dom_html.getElementById "error-modal" in
-  ignore (Js_of_ocaml.Dom_events.listen error_elt (Js_of_ocaml.Dom_events.Typ.make "hide.bs.modal") @@ fun _ _ ->
-          app##.error := undefined; true);
-]
+[%%mounted fun app -> load app]
 
 [%%app {
   conv; mount; unhide; export;

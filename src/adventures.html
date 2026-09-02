@@ -1,6 +1,6 @@
 <div>
   <div v-for="a in adventures" class="card text-center">
-    <div class="card-body" @click="adventure(a)" role="button">
+    <div class="card-body" @click="adventure(a.id)" role="button">
       {{ a.name }}
     </div>
     <div class="card-footer text-center">

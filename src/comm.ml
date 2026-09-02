@@ -45,9 +45,9 @@ let send ?id ~dst ~adventure (kind: message_kind) =
   let aux conn =
     log "sending message to %s for %s" (to_string conn##.peer) adventure;
     let () = match kind with
-      | Sync sync -> log "sync %a" Db.print_sync sync
-      | Modifs (sync, l) -> log "modifs (%d) %a" (List.length l) Db.print_sync sync
-      | _ -> () in
+      | Sync sync -> log "sync (%a)" Db.print_sync sync
+      | Modifs (sync, l) -> log "modifs (%d) (%a)" (List.length l) Db.print_sync sync
+      | Adventure adv -> log "adventure %s" adv.id in
     let msg = {id; kind; adventure} in
     PeerJS.send conn (message_to_jsoo msg) in
   match dst with
@@ -63,16 +63,19 @@ let sync_adventure ~conn ~adventure sync =
     send ~dst:(`conn conn) ~adventure (Sync sync)
   ) @@ Db.outdated_sync ~adventure sync
 
+let refresh : (A.id -> unit) ref = ref (fun _ -> ())
+
 let listener (conn: PeerJS.data_connection t) ({adventure; kind; _}: message) =
   let peer = to_string conn##.peer in
   log "receiving message from %s for %s" peer adventure;
   match kind with
   | Sync sync ->
-    log "sync %a" Db.print_sync sync;
+    log "sync (%a)" Db.print_sync sync;
     sync_adventure ~conn ~adventure sync
   | Modifs (sync, modifs) ->
-    log "modifs (%d) %a" (List.length modifs) Db.print_sync sync;
+    log "modifs (%d) (%a)" (List.length modifs) Db.print_sync sync;
     Db.insert_modifs ~adventure (sync, modifs) @@ fun () ->
+    !refresh adventure;
     let sync = Db.get_sync adventure in
     send ~dst:(`conn conn) ~adventure (Sync sync)
   | _ -> ()
@@ -104,13 +107,14 @@ let add_peer_listener (peer: PeerJS.peer t) =
     List.iter (fun (adventure, sync) -> sync_adventure ~conn ~adventure sync) l
   | _ -> ()
 
-let send_modif ?(listen=false) ~(adventure: adventure) ~(sync: sync) m =
+let sync ?(listen=false) (adventure: adventure) =
+  let sync = Db.get_sync adventure.id in
   List.iter (fun (s: sailor) ->
     Option.iter (fun dst ->
       if dst <> !Db.peer then
         connect dst (fun conn ->
           if listen then add_data_listener conn;
-          send ~dst:(`conn conn) ~adventure:adventure.id (Modifs (sync, [ m ])))
+          send ~dst:(`conn conn) ~adventure:adventure.id (Sync sync))
     ) s.peer
   ) adventure.crew
 

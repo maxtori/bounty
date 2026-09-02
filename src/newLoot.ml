@@ -16,7 +16,7 @@ let%data lt app : loot = match to_optdef loot_of_jsoo app##.loot with
     let tsp = Ui.now () in
     let loot = {
       id = id (); adventure=(to_string app##.adv##.id);
-      name=""; updated = tsp; date = tsp; update = tsp;
+      name=""; updated = tsp; date = tsp;
       captain; treasurer=captain; amount=zero; shares; currency=None } in
     loot
 
@@ -117,16 +117,13 @@ and push app =
   let old = to_optdef loot_of_jsoo app##.loot in
   if Option.compare compare_loot old (Some loot) = 0 then alert app "The loot hasn't been changed" else
   let tsp = now () in
-  let loot = { loot with updated = tsp } in
-  Db.register_loot loot;
-  let adv = { adv with updated = tsp; loots = [] } in
-  Db.update_adventure adv;
-  let m, sync = Db.create_modif ~tsp ~adventure:adv.id (NewLoot loot) in
-  Comm.send_modif ~adventure:adv ~sync m;
-  nav app (mkr (Adventure adv))
+  let m = Db.create_modif ~tsp ~adventure:adv.id (Loot { loot with updated=tsp }) in
+  Db.apply_modif adv m @@ fun adv ->
+  Comm.sync adv;
+  nav app (mkr (Adventure adv.id))
 
 and adventure app =
-  let adv = adventure_of_jsoo app##.adv in
-  nav app (mkr (Adventure adv))
+  let id = A.id_of_jsoo app##.adv##.id in
+  nav app (mkr (Adventure id))
 
 [%%comp {name="new-loot"; conv}]
