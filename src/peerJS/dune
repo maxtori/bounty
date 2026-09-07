@@ -1,0 +1,7 @@
+(library
+ (name peerJS)
+ (public_name peerJS)
+ (modules peerJS)
+ (preprocess (pps ppx_deriving_jsoo))
+ (libraries ezjs_min)
+ (modes byte))

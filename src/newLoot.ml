@@ -117,13 +117,11 @@ and push app =
   let old = to_optdef loot_of_jsoo app##.loot in
   if Option.compare compare_loot old (Some loot) = 0 then alert app "The loot hasn't been changed" else
   let tsp = now () in
-  let m = Db.create_modif ~tsp ~adventure:adv.id (Loot { loot with updated=tsp }) in
-  Db.apply_modif adv m @@ fun adv ->
-  Comm.sync adv;
-  nav app (mkr (Adventure adv.id))
+  Back.process ~tsp ~id:(id ()) adv (Loot { loot with updated=tsp }) @@ fun () ->
+  adventure app adv.id
 
 and adventure app =
   let id = A.id_of_jsoo app##.adv##.id in
-  nav app (mkr (Adventure id))
+  adventure app id
 
 [%%comp {name="new-loot"; conv}]

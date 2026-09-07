@@ -25,21 +25,23 @@ let navigate app (r: route_jsoo t) =
       Dom_html.window##.history##pushState (state p1) (string "") path in
   finish app
 
-let init app = navigate app (mkr Adventures)
+let init app = adventures ~nav:navigate app
 
-let refresh app adventure = match page_of_jsoo app##.page with
-  | Adventure id when id = adventure -> navigate app (mkr (Adventure id))
-  | EditAdventure ({ id; _ } as adv) when id = adventure -> app##nav (mkr (EditAdventure { adv with loots=[] }))
-  | Adventures -> navigate app (mkr Adventures)
+let refresh app adv_id = match page_of_jsoo app##.page with
+  | Adventure { id; _ } when id = adv_id -> adventure ~nav:navigate app id
+  | EditAdventure { id; _ } when id = adv_id ->
+    Db.get_adventure id (function
+      | Some adv -> navigate app (mkr (EditAdventure { adv with loots=[] }))
+      | None -> adventures ~nav:navigate app)
+  | Adventures _ -> adventures ~nav:navigate app
   | _ -> ()
 
 let load app =
   Db.open_ @@ fun () ->
   Db.load_settings @@ fun () ->
   Db.get_adventures @@ fun adventures ->
-  Db.init adventures @@ fun () ->
-  Comm.init adventures;
-  Comm.refresh := refresh app;
+  Back.init adventures @@ fun () ->
+  Back.refresh := refresh app;
   Dom_html.window##.onpopstate := Dom_html.handler (fun (e : Dom_html.popStateEvent t) ->
     (try navigate app (mkrjs ~set_state:false @@ Unsafe.coerce e##.state) with _exn -> init app); _false);
   (Unsafe.coerce Dom_html.window)##.onfocus := Dom_html.handler (fun (_e : Dom_html.popStateEvent t) ->

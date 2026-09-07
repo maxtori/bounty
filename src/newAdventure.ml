@@ -52,11 +52,15 @@ and push app =
     if adv.name = "" then alert app "The adventure needs a name"
     else if List.exists (fun (s: sailor) -> s.name = "") adv.crew then
       alert app "Every sailor needs a name"
-    else (Db.register_adventure adv; nav app (mkr (Adventure adv.id)))
+    else (Db.register_adventure adv; adventure app adv.id)
   | Some old ->
     let modifs = to_listf modif_kind_of_jsoo app##.modifs in
     let modifs = if old.name <> adv.name then modifs @ [ AdventureName adv.name ] else modifs in
     let modifs = if old.currency <> adv.currency then modifs @ [ AdventureCurrency adv.currency ] else modifs in
+    let modifs = List.fold_left (fun acc (s: sailor) ->
+      if List.exists (fun (s_old: sailor) -> s_old.id = s.id && s_old.name <> s.name) old.crew then
+        acc @ [ Sailor s ]
+      else acc) modifs adv.crew in
     match modifs with
     | [] -> alert app "The adventure hasn't been changed"
     | _ ->
@@ -66,11 +70,11 @@ and push app =
             Sailor (Option.value ~default:s @@
                     List.find_opt (fun (sailor: sailor) -> sailor.id = s.id) adv.crew)
           | k -> k in
-        acc @ [ Db.create_modif ~tsp ~adventure:adv.id kind ], Float.succ tsp
+        acc @ [ Back.create ~id:(id ()) ~tsp ~entity:adv.id kind ], Float.succ tsp
       ) ([], now ()) modifs in
-      Db.apply_modifs old modifs @@ fun adv ->
-      Comm.sync adv;
-      nav app (mkr (Adventure adv.id))
+      Back.apply old modifs @@ fun adv ->
+      Back.sync adv;
+      adventure app adv.id
 
 and refresh _app = ()
 

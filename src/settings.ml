@@ -7,6 +7,6 @@ let%prop settings : settings = {req}
 
 let%meth push app =
   Db.set_currency (to_string app##.settings##.currency);
-  nav app (mkr Adventures)
+  adventures app
 
 [%%comp {name="settings"; conv}]

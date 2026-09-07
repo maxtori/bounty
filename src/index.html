@@ -23,8 +23,8 @@
       <navigation :page="selected" @nav="nav" @push="push"></navigation>
       <div class="container-fluid mt-3 mb-5 px-0">
         <div v-if="page.loading!==undefined" class="text-center my-5 py-5"><div class="spinner-border"></div></div>
-        <adventures v-else-if="page.adventures!==undefined" ref="adventures" @nav="nav"></adventures>
-        <adventure v-else-if="page.adventure!==undefined" ref="adventure" :id="page.adventure" @nav="nav"></adventure>
+        <adventures v-else-if="page.adventures!==undefined" :adventures="page.adventures" ref="adventures" @nav="nav"></adventures>
+        <adventure v-else-if="page.adventure!==undefined" ref="adventure" :adv="page.adventure" @nav="nav"></adventure>
         <new-adventure v-else-if="page.new_adventure!==undefined" ref="new_adventure" @nav="nav" @alert="alert"></new-adventure>
         <new-adventure v-else-if="page.edit_adventure!==undefined" ref="edit_adventure" :adventure="page.edit_adventure" @nav="nav" @alert="alert"></new-adventure>
         <join-adventure v-else-if="page.join_adventure!==undefined" ref="join_adventure" :info="page.join_adventure" @nav="nav" @alert="alert"></join-adventure>

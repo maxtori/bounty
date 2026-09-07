@@ -72,33 +72,33 @@ type modif_kind =
   | RemoveLoot of A.id
 [@@deriving encoding, jsoo]
 
-type modif = {
-  id: A.id;
-  adventure: A.id;
-  kind: modif_kind;
-  origin: A.id;
-  seq: int;
-  tsp: A.tsp;
-} [@@deriving encoding, jsoo]
+(* type modif = { *)
+(*   id: A.id; *)
+(*   adventure: A.id; *)
+(*   kind: modif_kind; *)
+(*   origin: A.id; *)
+(*   seq: int; *)
+(*   tsp: A.tsp; *)
+(* } [@@deriving encoding, jsoo] *)
 
-type sync = (A.id * int) list [@assoc] [@@deriving encoding]
-[@@@jsoo
-  type sync_jsoo = int Ezjs_min.Table.ct
-  let sync_to_jsoo (l: sync) : sync_jsoo Ezjs_min.t = Ezjs_min.Table.make l
-  let sync_of_jsoo (js: sync_jsoo Ezjs_min.t) : sync = Ezjs_min.Table.items (Ezjs_min.Unsafe.coerce js)
-]
+(* type sync = (A.id * int) list [@assoc] [@@deriving encoding] *)
+(* [@@@jsoo *)
+(*   type sync_jsoo = int Ezjs_min.Table.ct *)
+(*   let sync_to_jsoo (l: sync) : sync_jsoo Ezjs_min.t = Ezjs_min.Table.make l *)
+(*   let sync_of_jsoo (js: sync_jsoo Ezjs_min.t) : sync = Ezjs_min.Table.items (Ezjs_min.Unsafe.coerce js) *)
+(* ] *)
 
-type message_kind =
-  | Adventure of adventure
-  | Modifs of (sync * modif list)
-  | Sync of sync
-[@@deriving encoding, jsoo]
+(* type message_kind = *)
+(*   | Adventure of adventure *)
+(*   | Modifs of (sync * modif list) *)
+(*   | Sync of sync *)
+(* [@@deriving encoding, jsoo] *)
 
-type message = {
-  id: A.id;
-  adventure: A.id;
-  kind: message_kind;
-} [@@deriving encoding, jsoo]
+(* type message = { *)
+(*   id: A.id; *)
+(*   adventure: A.id; *)
+(*   kind: message_kind; *)
+(* } [@@deriving encoding, jsoo] *)
 
 let id () =
   Uuidm.(to_string @@ v4_gen (Random.State.make_self_init ()) ())
@@ -196,6 +196,6 @@ let compare_loot lt1 lt2 =
   let s1, s2 = EzEncoding.construct loot_enc lt1, EzEncoding.construct loot_enc lt2 in
   String.compare s1 s2
 
-let compare_modif m1 m2 =
-  let c = Float.compare m1.tsp m2.tsp in
-  if c <> 0 then c else String.compare m1.id m2.id
+(* let compare_modif m1 m2 = *)
+(*   let c = Float.compare m1.tsp m2.tsp in *)
+(*   if c <> 0 then c else String.compare m1.id m2.id *)

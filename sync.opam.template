@@ -1,0 +1,4 @@
+pin-depends: [
+  [ "ezjs_min.dev" "git+https://github.com/ocamlpro/ezjs_min.git" ]
+  [ "ppx_deriving_jsoo.dev" "git+https://gitlab.com/o-labs/ppx_deriving_jsoo.git" ]
+]

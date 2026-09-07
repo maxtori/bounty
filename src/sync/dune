@@ -1,0 +1,24 @@
+(library
+ (name sync)
+ (public_name sync)
+ (modules types sync)
+ (preprocess (pps ppx_deriving_jsoo))
+ (modes byte))
+
+(library
+ (name sync_idb)
+ (optional)
+ (public_name sync.idb)
+ (modules sync_idb)
+ (preprocess (pps ppx_deriving_jsoo))
+ (libraries sync ezjs_idb)
+ (modes byte))
+
+(library
+ (name sync_peerjs)
+ (optional)
+ (public_name sync.peerjs)
+ (modules sync_peerjs)
+ (preprocess (pps ppx_deriving_jsoo))
+ (libraries sync peerJS)
+ (modes byte))

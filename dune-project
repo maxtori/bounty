@@ -10,10 +10,21 @@
 (documentation https://github.com/maxtori/bounty)
 
 (package
+ (name peerJS)
+ (synopsis "PeerJS binding")
+ (depends ezjs_min (ppx_deriving_jsoo :build)))
+
+(package
+ (name sync)
+ (synopsis "Sync")
+ (depends ezjs_min (ppx_deriving_jsoo :build))
+ (depopts ezjs_idb peerJS))
+
+(package
  (name bounty)
  (synopsis "bounty")
  (depends
-  ez_api ezjs_idb vue-ppx
+  ez_api ezjs_idb peerJS sync vue-ppx
   (ppx_deriving_encoding :build)
   (ppx_deriving_jsoo :build)
   (conf-npm :build)))

@@ -19,8 +19,8 @@ type settings = {
 
 type page =
   | Loading
-  | Adventures
-  | Adventure of A.id
+  | Adventures of adventure list
+  | Adventure of adventure
   | NewAdventure
   | EditAdventure of adventure
   | Loot of adv_and_loot
@@ -87,3 +87,13 @@ let nav app (r: route_jsoo t) = [%emit "nav" app r]
 
 let me crew =
   List.find_map (fun (s: sailor) -> if s.peer = Some !Db.peer then Some s.id else None) crew
+
+let adventures ?(nav=nav) app =
+  Db.get_adventures @@ function
+  | [] -> nav app (mkr NewAdventure)
+  | l -> nav app (mkr (Adventures l))
+
+let adventure ?path ?(nav=nav) app id =
+  Db.load_adventure id @@ function
+  | Some adv -> nav app (mkr ?path (Adventure adv))
+  | None -> adventures ~nav app

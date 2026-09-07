@@ -37,10 +37,8 @@ and remove app =
   let al = adv_and_loot_of_jsoo app##.loot in
   match to_optdef A.id_of_jsoo app##.me with
   | Some me when me = al.loot.captain ->
-    let m = Db.create_modif ~tsp:(now ()) ~adventure:al.adv.id (RemoveLoot al.loot.id) in
-    Db.apply_modif al.adv m @@ fun adv ->
-    Comm.sync adv;
-    nav app (mkr (Adventure adv.id))
+    Back.process ~id:(id ()) ~tsp:(now ()) al.adv (RemoveLoot al.loot.id) @@ fun () ->
+    adventure app al.adv.id
   | _ -> alert app "Only the captain of a loot can modify it"
 
 and edit app =
@@ -55,6 +53,6 @@ and show_datetime _app (tsp: float) =
 
 and adventure app =
   let adv = adventure_of_jsoo app##.loot##.adv in
-  nav app (mkr (Adventure adv.id))
+  adventure app adv.id
 
 [%%comp {name="loot"; conv}]

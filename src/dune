@@ -1,12 +1,4 @@
 (library
- (name peerJS)
- (public_name bounty.peer_js)
- (modules peerJS)
- (preprocess (pps ppx_deriving_jsoo))
- (libraries ezjs_min)
- (modes byte))
-
- (library
  (name bounty)
  (public_name bounty)
  (modules bounty)
@@ -17,10 +9,10 @@
 (library
  (name ui)
  (public_name bounty.ui)
- (modules db comm ui)
+ (modules db back ui)
  (wrapped false)
  (preprocess (pps ppx_deriving_jsoo vue-ppx))
- (libraries ezjs_idb bounty)
+ (libraries bounty sync.idb sync.peerjs)
  (modes byte))
 
 (executable
