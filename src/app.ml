@@ -18,12 +18,10 @@ let navigate app (r: route_jsoo t) =
       if to_bool r##.set_state_ then
         let p0 = match Optdef.to_option r##.prev with None -> p0 | Some p0 -> p0 in
         Dom_html.window##.history##replaceState (state p0) (string "") null in
-  let finish app =
-    app##.page := p1;
-    if to_bool r##.set_state_ then
-      let path = Opt.option (Optdef.to_option r##.path) in
-      Dom_html.window##.history##pushState (state p1) (string "") path in
-  finish app
+  app##.page := p1;
+  if to_bool r##.set_state_ then
+    let path = Opt.option (Optdef.to_option r##.path) in
+    Dom_html.window##.history##pushState (state p1) (string "") path
 
 let init app = adventures ~nav:navigate app
 
@@ -37,10 +35,10 @@ let refresh app adv_id = match page_of_jsoo app##.page with
   | _ -> ()
 
 let load app =
-  Db.open_ @@ fun () ->
-  Db.load_settings @@ fun () ->
-  Db.get_adventures @@ fun adventures ->
-  Back.init adventures @@ fun () ->
+  let@ () = Db.open_ in
+  let@ () = Db.load_settings in
+  let@ adventures = Db.get_adventures in
+  let@ () = Back.init adventures in
   Back.refresh := refresh app;
   Dom_html.window##.onpopstate := Dom_html.handler (fun (e : Dom_html.popStateEvent t) ->
     (try navigate app (mkrjs ~set_state:false @@ Unsafe.coerce e##.state) with _exn -> init app); _false);

@@ -72,7 +72,7 @@ and push app =
           | k -> k in
         acc @ [ Back.create ~id:(id ()) ~tsp ~entity:adv.id kind ], Float.succ tsp
       ) ([], now ()) modifs in
-      Back.apply old modifs @@ fun adv ->
+      let@ adv = Back.apply old modifs in
       Back.sync adv;
       adventure app adv.id
 

@@ -17,7 +17,7 @@ let%meth push app =
     | None -> alert app "Sailor not identified"
     | Some { peer = Some _; _ } -> alert app "Sailor is already identified by someone else"
     | Some s ->
-      Back.process ~listen:true ~id:(id ()) ~tsp:(now ()) adv (Sailor { s with peer = Some !Db.peer }) @@ fun () ->
+      let@ () = Back.process ~listen:true ~id:(id ()) ~tsp:(now ()) adv (Sailor { s with peer = Some !Db.peer }) in
       let path = to_string Dom_html.window##.location##.pathname in
       adventure ~path app adv.id
 

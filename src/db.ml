@@ -80,12 +80,12 @@ let load_loots ~adventure f =
   let index = LootStore.get_index tst "adventure" in
   let iDBKeyRange : LootStore.K.js Types.iDBKeyRange t = Unsafe.global##._IDBKeyRange in
   let key = LootStore.KR (iDBKeyRange##only (string adventure)) in
-  LootStore.get_all ~key (Unsafe.coerce index) @@ fun loots ->
+  let@ loots = LootStore.get_all ~key (Unsafe.coerce index) in
   f (List.sort compare_loot loots)
 
 let get_adventures f =
   let ast = AdventureStore.store ~mode:READONLY !db in
-  AdventureStore.get_all ast @@ fun l ->
+  let@ l = AdventureStore.get_all ast in
   f (List.sort compare_adventure l)
 
 let adventures_count f =

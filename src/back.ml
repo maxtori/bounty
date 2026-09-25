@@ -1,11 +1,14 @@
 open Bounty
 
+let refresh : (A.id -> unit) ref = ref (fun _ -> ())
+
 module Comm = Sync_peerjs.Make(struct
     type t = modif_kind [@@deriving jsoo]
     type nonrec jsoo = jsoo Ezjs_min.t
     type entity = adventure [@@deriving jsoo]
     type nonrec entity_jsoo = entity_jsoo Ezjs_min.t
     let origin () : Sync.Types.A.id = !Db.peer
+    let hook ~connect:_ _ = ()
   end)
 
 module App = struct
@@ -31,6 +34,7 @@ module App = struct
   let load = Db.get_adventure
   let id (adv: adventure) = adv.id
   let peers (adv: adventure) = List.filter_map (fun (s: sailor) -> s.peer) adv.crew
+  let hook id = !refresh id
 end
 
 include Sync.Make(Db.Sync)(Comm)(App)

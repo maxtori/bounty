@@ -34,7 +34,7 @@ module Make(S: S) = struct
     let l = List.sort Sync.Types.compare_modif l in
     f l
 
-  let register m =
+  let register (m: _ Sync.Types.modif) =
     let st = St.store ~mode:READWRITE (S.db ()) in
     St.put ~key:m.Sync.Types.id st m
 end

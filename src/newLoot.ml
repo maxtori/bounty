@@ -117,7 +117,7 @@ and push app =
   let old = to_optdef loot_of_jsoo app##.loot in
   if Option.compare compare_loot old (Some loot) = 0 then alert app "The loot hasn't been changed" else
   let tsp = now () in
-  Back.process ~tsp ~id:(id ()) adv (Loot { loot with updated=tsp }) @@ fun () ->
+  let@ () = Back.process ~tsp ~id:(id ()) adv (Loot { loot with updated=tsp }) in
   adventure app adv.id
 
 and adventure app =

@@ -85,13 +85,11 @@ module Make(Db: Types.Db)(Comm: Types.Comm with type content = Db.content)
     (match modifs with [] -> () | _ -> Comm.send ~conn ~entity (Modifs modifs));
     Option.iter (fun sync -> Comm.send ~conn ~entity (Sync sync)) @@ outdated ~entity sync
 
-  let refresh : (A.id -> unit) ref = ref (fun _ -> ())
-
   let listener (conn: Comm.conn) ({entity; kind}: _ message) = match kind with
     | Sync sync -> sync_entity ~conn ~entity sync
     | Modifs l ->
       insert ~entity l @@ Option.iter (fun _ ->
-        !refresh entity;
+        App.hook entity;
         let sync = get_sync entity in
         Comm.send ~conn ~entity (Sync sync))
     | _ -> ()

@@ -37,7 +37,7 @@ and remove app =
   let al = adv_and_loot_of_jsoo app##.loot in
   match to_optdef A.id_of_jsoo app##.me with
   | Some me when me = al.loot.captain ->
-    Back.process ~id:(id ()) ~tsp:(now ()) al.adv (RemoveLoot al.loot.id) @@ fun () ->
+    let@ () = Back.process ~id:(id ()) ~tsp:(now ()) al.adv (RemoveLoot al.loot.id) in
     adventure app al.adv.id
   | _ -> alert app "Only the captain of a loot can modify it"
 

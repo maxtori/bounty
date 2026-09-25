@@ -63,4 +63,5 @@ module type App = sig
   val load: A.id -> (entity option -> unit) -> unit
   val id: entity -> A.id
   val peers: entity -> A.id list
+  val hook: A.id -> unit
 end

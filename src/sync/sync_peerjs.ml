@@ -4,6 +4,7 @@ module type S = sig
   type t [@@deriving jsoo]
   type entity [@@deriving jsoo]
   val origin: unit -> Sync.Types.A.id
+  val hook: connect:bool -> Sync.Types.A.id -> unit
 end
 
 module Make(S: S) = struct
@@ -40,7 +41,8 @@ module Make(S: S) = struct
         | None -> PeerJS.connect p id
         | Some conn -> conn in
     if to_bool conn##.open_ then f conn
-    else PeerJS.data_once conn PeerJS.Open (fun _ -> f conn)
+    else PeerJS.data_once conn PeerJS.Open (fun _ -> S.hook ~connect:true id; f conn);
+    PeerJS.data_once conn PeerJS.Close (fun _ -> S.hook ~connect:false id)
 
   let send ~conn ~entity (kind: _ Sync.Types.message_kind) =
     let msg = Sync.Types.message_to_jsoo (S.entity_to_jsoo, S.entity_of_jsoo) (S.to_jsoo, S.of_jsoo) {Sync.Types.kind; entity} in
@@ -58,7 +60,10 @@ module Make(S: S) = struct
     peer @@ fun p ->
     PeerJS.peer_listen p PeerJS.Connection @@ fun conn ->
     f conn;
+    let peer = to_string conn##.peer in
+    PeerJS.data_once conn PeerJS.Close (fun () -> S.hook ~connect:false peer);
     PeerJS.data_once conn PeerJS.Open @@ fun () ->
+    S.hook ~connect:true peer;
     match to_optdef (fun x -> Sync.Types.A.id_of_jsoo (Unsafe.coerce x)) conn##.metadata with
     | Some id -> on conn (Some id)
     | _ | exception _ -> on conn None

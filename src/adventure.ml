@@ -48,7 +48,7 @@ and view_loot app (loot: loot) =
 
 and remove_loot app (loot: loot) =
   let adv = adventure_of_jsoo app##.adv in
-  Back.process ~tsp:(now ()) ~id:(id ()) adv (RemoveLoot loot.id) @@ fun () ->
+  let@ () = Back.process ~tsp:(now ()) ~id:(id ()) adv (RemoveLoot loot.id) in
   app##refresh
 
 and sailor_name app (id: A.id) : string option =
